@@ -5,64 +5,74 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_INITIAL_CAPACITY = 10;
     private static int CAPACITY = DEFAULT_INITIAL_CAPACITY;
-    private static final int MIN_DEEP = 2;
     private static int DEEP = 2;
-    ArrayList<Node>[] table1 = new ArrayList[DEFAULT_INITIAL_CAPACITY];
+    private ArrayList<Node>[] table1 = new ArrayList[DEFAULT_INITIAL_CAPACITY];
 
+    public IraHashMap() {
+        CAPACITY = DEFAULT_INITIAL_CAPACITY;
+    }
 
     @Override
     public boolean add(K key, V value) {
-        int hashCode = key.hashCode();
-        int index = hashCode % 10;
-        boolean flag;
-        if (table1[index] == null) {
-            table1[index] = new ArrayList<>(0);
-            flag = table1[index].add(new Node(key, value));
-        }
-        else if (findNode(table1[index], key) != null) {
-            findNode(table1[index], key).setValue(value);
-            flag = true;
-        }
-        else {
-            flag = table1[index].add(new Node(key, value));
-
-        }
-
-//        if (table.get(index).size() > DEEP * LOAD_FACTOR)
-//        {
-//
-//        }
-//        list.add(index, value);
-        return flag;
+        return addNode(table1,key,value);
     }
 
     @Override
     public V get(K key) {
         int hashCode = key.hashCode();
-        int index = hashCode % 10;
-        Node node = null;
+        int index = hashCode % CAPACITY;
         V value = null;
         for (Node item : table1[index]) {
-            node = item;
-            if (node.getKey().equals(key)) {
-                value = (V) node.getValue();
+            if (item.getKey().equals(key)) {
+                value = (V) item.getValue();
                 break;
             }
         }
         return value;
     }
 
-    private Node findNode(List<Node> bin, K key) {
-        Node node = null;
-        for (Node item : bin) {
-            node = item;
-            if (node.getKey().equals(key)) {
-//                value = (V) node.getValue();
-                break;
-            }
+
+    private boolean addNode(List[] array,K key, V value) {
+        int hashCode = key.hashCode();
+        int index = hashCode % CAPACITY;
+        boolean flag;
+
+        if (array[index] == null) {
+            array[index] = new ArrayList<>(0);
+            flag = array[index].add(new Node(key, value));
+        } else if (findNode(array[index], key) != null) {
+            findNode(array[index], key).setValue(value);
+            flag = true;
+        } else {
+            flag = array[index].add(new Node(key, value));
         }
-        return node;
+
+//        Check a bin size
+        if (array[index].size() > DEEP * LOAD_FACTOR) {
+            resizeTable();
+        }
+        return flag;
     }
 
+    private void resizeTable(){
 
+            CAPACITY = CAPACITY * 10;
+            ArrayList<Node>[] tempList = new ArrayList[CAPACITY];
+
+            for (List<Node> bin: table1) {
+                if (bin != null) {
+                    bin.forEach(node -> addNode(tempList, (K) node.getKey(), (V) node.getValue()));
+                }
+            }
+            table1 = tempList;
+    }
+
+    private Node findNode(List<Node> bin, K key) {
+        for (Node item : bin) {
+            if (item.getKey().equals(key)) {
+                return item;
+            }
+        }
+        return null;
+    }
 }
