@@ -17,14 +17,16 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
         boolean flag;
         if (table1[index] == null) {
             table1[index] = new ArrayList<>(0);
-
+            flag = table1[index].add(new Node(key, value));
         }
-        else if (Node node = findNode(table1[index], key) == null) {
-
-         }
+        else if (findNode(table1[index], key) != null) {
+            findNode(table1[index], key).setValue(value);
+            flag = true;
+        }
+        else {
             flag = table1[index].add(new Node(key, value));
 
-
+        }
 
 //        if (table.get(index).size() > DEEP * LOAD_FACTOR)
 //        {

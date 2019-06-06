@@ -12,6 +12,10 @@ public class Node<K, V> {
         return key;
     }
 
+    public void setValue(V value) {
+        this.value = value;
+    }
+
     public V getValue() {
         return value;
     }
