@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class IraHashMap<K, V> implements IHashStorage<K, V> {
@@ -52,7 +51,6 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
         return value;
     }
 
-
     private boolean addNode(List[] array, K key, V value) {
         int hashCode = key.hashCode();
         int index = hashCode % CAPACITY;
@@ -76,9 +74,7 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
     }
 
     private void resizeTable() {
-
-        CAPACITY = CAPACITY * 10;
-        ArrayList<Node>[] tempList = new ArrayList[CAPACITY];
+        ArrayList<Node>[] tempList = new ArrayList[CAPACITY * 10];
 
         for (List<Node> bin : table1) {
             if (bin != null) {
@@ -86,6 +82,7 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
             }
         }
         table1 = tempList;
+        CAPACITY = CAPACITY * 10;
     }
 
     private Node findNode(List<Node> bin, K key) {

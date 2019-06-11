@@ -5,10 +5,10 @@ import java.util.HashMap;
 public class Main {
     public static void main(String[] args) {
         IraHashMap m = new IraHashMap<>();
-        IraHashMap m1 = new IraHashMap<>(10, -9);
+//        IraHashMap m1 = new IraHashMap<>(10, -9);
 
-        m.add("a",5);
-        m.add("b",8);
+        m.add("a",null);
+        m.add(null,8);
         m.add("aa",2);
         m.add("bs",4);
         m.add("aa",10);
@@ -26,7 +26,7 @@ public class Main {
         m.add("cac",35);
 
         System.out.println(m.get("a"));
-        System.out.println(m.get("b"));
+        System.out.println(m.get(null));
         System.out.println(m.get("aa"));
         System.out.println(m.get("bs"));
 
