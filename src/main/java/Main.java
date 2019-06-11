@@ -1,8 +1,12 @@
 import java.util.HashMap;
-
+/**
+ * This demo class for IraHashMap
+*/
 public class Main {
     public static void main(String[] args) {
         IraHashMap m = new IraHashMap<>();
+        IraHashMap m1 = new IraHashMap<>(10, -9);
+
         m.add("a",5);
         m.add("b",8);
         m.add("aa",2);
