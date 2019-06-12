@@ -3,31 +3,32 @@ import java.util.List;
 
 public class IraHashMap<K, V> implements IHashStorage<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private final float LOAD_FACTOR;
     private static final int DEFAULT_INITIAL_CAPACITY = 10;
-    private int CAPACITY = DEFAULT_INITIAL_CAPACITY;
+    private static final int MAX_CAPACITY = 1000000000;
     private static int DEEP = 2;
+    private final float load_factor;
+    private int capacity = DEFAULT_INITIAL_CAPACITY;
     private ArrayList<Node>[] table1 = new ArrayList[DEFAULT_INITIAL_CAPACITY];
 
     public IraHashMap() {
-        CAPACITY = DEFAULT_INITIAL_CAPACITY;
-        LOAD_FACTOR = DEFAULT_LOAD_FACTOR;
+        capacity = DEFAULT_INITIAL_CAPACITY;
+        load_factor = DEFAULT_LOAD_FACTOR;
     }
 
-    public IraHashMap(float LOAD_FACTOR, int CAPACITY) {
-        if (CAPACITY < 0)
-            throw new IllegalArgumentException("CAPACITY should be greater than 0.");
-        if (LOAD_FACTOR < 1) {
-            throw new IllegalArgumentException("LOAD_FACTOR should have value from 0 to 1");
+    public IraHashMap(float load_factor, int capacity) {
+        if (capacity < 0)
+            throw new IllegalArgumentException("capacity should be greater than 0.");
+        if (load_factor < 1) {
+            throw new IllegalArgumentException("load_factor should have value from 0 to 1");
         }
-        this.CAPACITY = getValidCapacityValue(CAPACITY);
-        this.LOAD_FACTOR = LOAD_FACTOR;
+        this.capacity = getValidCapacityValue(capacity);
+        this.load_factor = load_factor;
     }
 
-    private static int getValidCapacityValue (int capacity){
+    private static int getValidCapacityValue(int capacity) {
         int i = 10;
-        while (capacity > i){
-            i=i*10;
+        while (capacity > i) {
+            i = i * 10;
         }
         return i;
     }
@@ -39,11 +40,18 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
 
     @Override
     public V get(K key) {
-        int hashCode = key.hashCode();
-        int index = hashCode % CAPACITY;
+        int hashCode;
+        int index;
         V value = null;
+        if (key != null) {
+            hashCode = key.hashCode();
+            index = hashCode % capacity;
+        } else {
+            index = 0;
+        }
+
         for (Node item : table1[index]) {
-            if (item.getKey().equals(key)) {
+            if (item.getKey() == key) {
                 value = (V) item.getValue();
                 break;
             }
@@ -52,8 +60,15 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
     }
 
     private boolean addNode(List[] array, K key, V value) {
-        int hashCode = key.hashCode();
-        int index = hashCode % CAPACITY;
+        int hashCode;
+        int index;
+        if (key != null) {
+            hashCode = Math.abs(key.hashCode());
+            index = hashCode % capacity;
+        } else {
+            index = 0;
+        }
+
         boolean flag;
 
         if (array[index] == null) {
@@ -67,27 +82,31 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
         }
 
 //        Check a bin size
-        if (array[index].size() > DEEP * LOAD_FACTOR) {
+        if (array[index].size() > DEEP * load_factor) {
             resizeTable();
         }
         return flag;
     }
 
     private void resizeTable() {
-        ArrayList<Node>[] tempList = new ArrayList[CAPACITY * 10];
+        if (capacity != MAX_CAPACITY) {
+            capacity = capacity * 10;
+            ArrayList<Node>[] tempList = new ArrayList[capacity * 10];
 
-        for (List<Node> bin : table1) {
-            if (bin != null) {
-                bin.forEach(node -> addNode(tempList, (K) node.getKey(), (V) node.getValue()));
+            for (List<Node> bin : table1) {
+                if (bin != null) {
+                    bin.forEach(node -> addNode(tempList, (K) node.getKey(), (V) node.getValue()));
+                }
             }
+            table1 = tempList;
         }
-        table1 = tempList;
-        CAPACITY = CAPACITY * 10;
+        else
+            System.out.println("Capacity has max value");
     }
 
     private Node findNode(List<Node> bin, K key) {
         for (Node item : bin) {
-            if (item.getKey().equals(key)) {
+            if (item.getKey() == key) {
                 return item;
             }
         }
