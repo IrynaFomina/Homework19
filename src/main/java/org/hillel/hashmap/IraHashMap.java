@@ -1,3 +1,5 @@
+package org.hillel.hashmap;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -5,7 +7,7 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_INITIAL_CAPACITY = 10;
     private static final int MAX_CAPACITY = 1000000000;
-    private static int DEEP = 2;
+    private static int DEEP = 40;
     private final float load_factor;
     private int capacity = DEFAULT_INITIAL_CAPACITY;
     private ArrayList<Node>[] table1 = new ArrayList[DEFAULT_INITIAL_CAPACITY];
@@ -44,7 +46,7 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
         int index;
         V value = null;
         if (key != null) {
-            hashCode = key.hashCode();
+            hashCode = Math.abs(key.hashCode());
             index = hashCode % capacity;
         } else {
             index = 0;
@@ -56,10 +58,15 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
                 break;
             }
         }
+
+//        for (int i = 0; i < DEEP; i++) {
+//            table1[index].get(i).getValue();
+//            break;
+//        }
         return value;
     }
 
-    private boolean addNode(List[] array, K key, V value) {
+    private boolean addNode(List<Node>[] array, K key, V value) {
         int hashCode;
         int index;
         if (key != null) {
@@ -72,7 +79,7 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
         boolean flag;
 
         if (array[index] == null) {
-            array[index] = new ArrayList<>(DEEP);
+            array[index] = new ArrayList(DEEP);
             flag = array[index].add(new Node(key, value));
         } else if (findNode(array[index], key) != null) {
             findNode(array[index], key).setValue(value);
@@ -83,12 +90,18 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
 
 //        Check a bin size
         if (array[index].size() > DEEP * load_factor) {
-            resizeTable();
+            try {
+                resizeTable();
+            } catch (Exception e) {
+                System.out.println(key);
+                System.out.println("Capacity has max value");
+                e.printStackTrace();
+            }
         }
         return flag;
     }
 
-    private void resizeTable() {
+    private void resizeTable()throws Exception{
         if (capacity != MAX_CAPACITY) {
             capacity = capacity * 10;
             ArrayList<Node>[] tempList = new ArrayList[capacity * 10];
@@ -100,8 +113,9 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
             }
             table1 = tempList;
         }
-        else
-            System.out.println("Capacity has max value");
+        else {
+            throw new Exception();
+        }
     }
 
     private Node findNode(List<Node> bin, K key) {
