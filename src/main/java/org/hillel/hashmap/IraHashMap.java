@@ -1,22 +1,51 @@
 package org.hillel.hashmap;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+/**
+ * This IHashStorage interface implementation
+ * @author Irina Fomina
+ * @version 1.2
+ */
 
 public class IraHashMap<K, V> implements IHashStorage<K, V> {
+    /**
+     * The load factor used when none specified in constructor.
+     */
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    /**
+     * The capacity used when none specified in constructor.
+     */
     private static final int DEFAULT_INITIAL_CAPACITY = 10;
+
+    /**
+     * The maximum capacity
+     */
     private static final int MAX_CAPACITY = 1000000000;
+    /**
+     * Size of bin
+     */
     private static int DEEP = 40;
     private final float load_factor;
-    private int capacity = DEFAULT_INITIAL_CAPACITY;
+    private int capacity;
+    /**
+     * Bins array
+     */
     private ArrayList<Node>[] table1 = new ArrayList[DEFAULT_INITIAL_CAPACITY];
 
+    /**
+     * Default constructor
+     */
     public IraHashMap() {
         capacity = DEFAULT_INITIAL_CAPACITY;
         load_factor = DEFAULT_LOAD_FACTOR;
     }
 
+    /**
+    * Constructor
+     * @param load_factor the load factor
+     * @param capacity the capacity
+     */
     public IraHashMap(float load_factor, int capacity) {
         if (capacity < 0)
             throw new IllegalArgumentException("capacity should be greater than 0.");
@@ -34,12 +63,16 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
         }
         return i;
     }
-
+/**
+ * Add new node to map
+ */
     @Override
     public boolean add(K key, V value) {
         return addNode(table1, key, value);
     }
-
+/**
+ * Get value from map
+ */
     @Override
     public V get(K key) {
         int hashCode;

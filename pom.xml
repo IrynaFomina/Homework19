@@ -28,7 +28,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>site</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
