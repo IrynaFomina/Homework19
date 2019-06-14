@@ -31,7 +31,7 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
     /**
      * Bins array
      */
-    private ArrayList<Node>[] table1 = new ArrayList[DEFAULT_INITIAL_CAPACITY];
+    private ArrayList<Node<K,V>>[] table1 = new ArrayList[DEFAULT_INITIAL_CAPACITY];
 
     /**
      * Default constructor
@@ -79,15 +79,16 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
         int index;
         V value = null;
         if (key != null) {
-            hashCode = Math.abs(key.hashCode());
+            hashCode = key.hashCode();
+            hashCode = hashCode > 0 ? hashCode: Math.abs(hashCode) + 1;
             index = hashCode % capacity;
         } else {
             index = 0;
         }
 
-        for (Node item : table1[index]) {
+        for (Node<K,V> item : table1[index]) {
             if (item.getKey() == key) {
-                value = (V) item.getValue();
+                value = item.getValue();
                 break;
             }
         }
@@ -99,11 +100,12 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
         return value;
     }
 
-    private boolean addNode(List<Node>[] array, K key, V value) {
+    private boolean addNode(List<Node<K,V>>[] array, K key, V value) {
         int hashCode;
         int index;
         if (key != null) {
-            hashCode = Math.abs(key.hashCode());
+            hashCode = key.hashCode();
+            hashCode = hashCode > 0 ? hashCode: Math.abs(hashCode) + 1;
             index = hashCode % capacity;
         } else {
             index = 0;
@@ -137,11 +139,11 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
     private void resizeTable()throws Exception{
         if (capacity != MAX_CAPACITY) {
             capacity = capacity * 10;
-            ArrayList<Node>[] tempList = new ArrayList[capacity * 10];
+            ArrayList<Node<K,V>>[] tempList = new ArrayList[capacity * 10];
 
-            for (List<Node> bin : table1) {
+            for (List<Node<K,V>> bin : table1) {
                 if (bin != null) {
-                    bin.forEach(node -> addNode(tempList, (K) node.getKey(), (V) node.getValue()));
+                    bin.forEach(node -> addNode(tempList, node.getKey(), node.getValue()));
                 }
             }
             table1 = tempList;
@@ -151,7 +153,7 @@ public class IraHashMap<K, V> implements IHashStorage<K, V> {
         }
     }
 
-    private Node findNode(List<Node> bin, K key) {
+    private Node findNode(List<Node<K,V>> bin, K key) {
         for (Node item : bin) {
             if (item.getKey() == key) {
                 return item;
